@@ -8,6 +8,7 @@ function Nav({ navigate }) {
       <button className="nav-btn" onClick={() => navigate('dashboard')}>Home</button>
       <button className="nav-btn" onClick={() => navigate('plan')}>Plan</button>
       <button className="nav-btn" onClick={() => navigate('stats')}>Stats</button>
+      <button className="nav-btn" onClick={() => navigate('hints')} style={{ background: 'rgba(124,106,247,0.15)', color: '#7c6af7', border: '1px solid rgba(124,106,247,0.3)' }}>🤖 AI Hints</button>
     </nav>
   );
 }

@@ -3,6 +3,7 @@ import Dashboard from './pages/Dashboard';
 import PlanView from './pages/PlanView';
 import DayView from './pages/DayView';
 import StatsPage from './pages/StatsPage';
+import HintEngine from './pages/HintEngine';
 import './App.css';
 
 export default function App() {
@@ -10,23 +11,16 @@ export default function App() {
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedWeek, setSelectedWeek] = useState(null);
   const [progress, setProgress] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('dsa_progress') || '{}');
-    } catch { return {}; }
+    try { return JSON.parse(localStorage.getItem('dsa_progress') || '{}'); }
+    catch { return {}; }
   });
   const [notes, setNotes] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('dsa_notes') || '{}');
-    } catch { return {}; }
+    try { return JSON.parse(localStorage.getItem('dsa_notes') || '{}'); }
+    catch { return {}; }
   });
 
-  useEffect(() => {
-    localStorage.setItem('dsa_progress', JSON.stringify(progress));
-  }, [progress]);
-
-  useEffect(() => {
-    localStorage.setItem('dsa_notes', JSON.stringify(notes));
-  }, [notes]);
+  useEffect(() => { localStorage.setItem('dsa_progress', JSON.stringify(progress)); }, [progress]);
+  useEffect(() => { localStorage.setItem('dsa_notes', JSON.stringify(notes)); }, [notes]);
 
   const toggleProblem = (dayNum, problemId) => {
     const key = `${dayNum}-${problemId}`;
@@ -46,25 +40,14 @@ export default function App() {
 
   return (
     <div className="app">
-      {page === 'dashboard' && (
-        <Dashboard progress={progress} navigate={navigate} />
-      )}
-      {page === 'plan' && (
-        <PlanView progress={progress} navigate={navigate} selectedWeek={selectedWeek} />
-      )}
+      {page === 'dashboard' && <Dashboard progress={progress} navigate={navigate} />}
+      {page === 'plan' && <PlanView progress={progress} navigate={navigate} selectedWeek={selectedWeek} />}
       {page === 'day' && selectedDay !== null && (
-        <DayView
-          day={selectedDay}
-          progress={progress}
-          notes={notes}
-          toggleProblem={toggleProblem}
-          updateNote={updateNote}
-          navigate={navigate}
-        />
+        <DayView day={selectedDay} progress={progress} notes={notes}
+          toggleProblem={toggleProblem} updateNote={updateNote} navigate={navigate} />
       )}
-      {page === 'stats' && (
-        <StatsPage progress={progress} navigate={navigate} />
-      )}
+      {page === 'stats' && <StatsPage progress={progress} navigate={navigate} />}
+      {page === 'hints' && <HintEngine navigate={navigate} />}
     </div>
   );
 }

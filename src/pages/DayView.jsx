@@ -94,6 +94,11 @@ export default function DayView({ day, progress, notes, toggleProblem, updateNot
                       {problem.title}
                     </a>
                     <span className={`diff-badge diff-${problem.difficulty}`}>{problem.difficulty}</span>
+                    <button
+                      onClick={() => navigate('hints')}
+                      title="Get AI hint for this problem"
+                      style={{ background: 'rgba(124,106,247,0.15)', border: '1px solid rgba(124,106,247,0.3)', borderRadius: 6, padding: '3px 8px', color: '#7c6af7', fontSize: 11, cursor: 'pointer', fontWeight: 600, flexShrink: 0 }}
+                    >💡 Hint</button>
                   </div>
                 );
               })}
