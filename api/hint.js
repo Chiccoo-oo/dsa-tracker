@@ -1,5 +1,6 @@
 // api/hint.js — Vercel Serverless Function
-// Uses Google Gemini API (completely FREE — 1500 requests/day, no credit card)
+// Uses Groq API (completely FREE — no credit card, no billing ever)
+// Model: llama-3.3-70b — excellent for coding & DSA explanations
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -12,10 +13,10 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
     return res.status(500).json({
-      error: 'API key not configured. Add GEMINI_API_KEY in Vercel environment variables.',
+      error: 'API key not configured. Add GROQ_API_KEY in Vercel environment variables.',
     });
   }
 
@@ -23,29 +24,37 @@ export default async function handler(req, res) {
   if (!prompt) return res.status(400).json({ error: 'No prompt provided' });
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            maxOutputTokens: max_tokens,
-            temperature: 0.7,
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens,
+        temperature: 0.7,
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert DSA tutor helping beginners learn algorithms and data structures. You give clear, structured explanations with examples.',
           },
-        }),
-      }
-    );
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+      }),
+    });
 
     const data = await response.json();
 
     if (!response.ok) {
-      const errMsg = data.error?.message || 'Gemini API error';
+      const errMsg = data.error?.message || 'Groq API error';
       return res.status(response.status).json({ error: errMsg });
     }
 
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const text = data.choices?.[0]?.message?.content || '';
     return res.status(200).json({ content: text });
 
   } catch (err) {
